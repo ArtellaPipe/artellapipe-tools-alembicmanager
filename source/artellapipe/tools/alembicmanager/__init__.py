@@ -69,8 +69,8 @@ def run(project, do_reload=False):
     """
 
     init(do_reload=do_reload)
-    from artellapipe.tools.lightrigsmanager import lightrigsmanager
-    win = lightrigsmanager.run(project=project)
+    from artellapipe.tools.alembicmanager import alembicmanager
+    win = alembicmanager.run(project=project)
     return win
 
 

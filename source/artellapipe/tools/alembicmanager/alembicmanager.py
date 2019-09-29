@@ -24,8 +24,6 @@ import artellapipe.tools.alembicmanager
 from artellapipe.utils import resource
 from artellapipe.gui import window
 
-from artellapipe.tools.alembicmanager.widgets import alembicgroup
-
 logging.config.fileConfig(artellapipe.tools.alembicmanager.get_logging_config(), disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
 logger.setLevel(artellapipe.tools.alembicmanager.get_logging_level())
@@ -45,6 +43,8 @@ class AlembicManager(window.ArtellaWindow, object):
 
     def ui(self):
         super(AlembicManager, self).ui()
+
+        from artellapipe.tools.alembicmanager.widgets import alembicgroup
 
         alembic_icon = resource.ResourceManager.instance().icon('alembic_white')
         export_icon = resource.ResourceManager.instance().icon('export')
