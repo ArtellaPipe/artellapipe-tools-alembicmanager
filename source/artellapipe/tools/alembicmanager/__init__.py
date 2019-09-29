@@ -17,9 +17,9 @@ from tpPyUtils import importer
 from artellapipe.utils import resource, exceptions
 
 
-class AssetsManager(importer.Importer, object):
+class AlembicManager(importer.Importer, object):
     def __init__(self):
-        super(AssetsManager, self).__init__(module_name='artellapipe.tools.alembicmanager')
+        super(AlembicManager, self).__init__(module_name='artellapipe.tools.alembicmanager')
 
     def get_module_path(self):
         """
@@ -52,10 +52,10 @@ def init(do_reload=False):
         'artellapipe.tools.alembicmanager.core'
     ]
 
-    assetsmanager_importer = importer.init_importer(importer_class=AssetsManager, do_reload=False)
-    assetsmanager_importer.import_packages(order=packages_order, only_packages=False)
+    alembicmanager_importer = importer.init_importer(importer_class=AlembicManager, do_reload=False)
+    alembicmanager_importer.import_packages(order=packages_order, only_packages=False)
     if do_reload:
-        assetsmanager_importer.reload_all()
+        alembicmanager_importer.reload_all()
 
     create_logger_directory()
 
@@ -103,10 +103,10 @@ def get_logging_level():
     :return: str
     """
 
-    if os.environ.get('ARTELLAPIPE_TOOLS_ASSETSMANAGER_LOG_LEVEL', None):
-        return os.environ.get('ARTELLAPIPE_TOOLS_ASSETSMANAGER_LOG_LEVEL')
+    if os.environ.get('ARTELLAPIPE_TOOLS_ALEMBICMANAGER_LOG_LEVEL', None):
+        return os.environ.get('ARTELLAPIPE_TOOLS_ALEMBICMANAGER_LOG_LEVEL')
 
-    return os.environ.get('ARTELLAPIPE_TOOLS_ASSETSMANAGER_LOG_LEVEL', 'WARNING')
+    return os.environ.get('ARTELLAPIPE_TOOLS_ALEMBICMANAGER_LOG_LEVEL', 'WARNING')
 
 
 def register_importer(cls):
