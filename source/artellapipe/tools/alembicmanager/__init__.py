@@ -6,6 +6,7 @@ Initialization module for artellapipe-tools-lightrigsmanager
 """
 
 import os
+import sys
 import inspect
 
 import sentry_sdk
@@ -18,7 +19,7 @@ from artellapipe.utils import resource, exceptions
 
 class AssetsManager(importer.Importer, object):
     def __init__(self):
-        super(AssetsManager, self).__init__(module_name='artellapipe.tools.lightrigsmanager')
+        super(AssetsManager, self).__init__(module_name='artellapipe.tools.alembicmanager')
 
     def get_module_path(self):
         """
@@ -46,7 +47,10 @@ def init(do_reload=False):
     Initializes module
     """
 
-    packages_order = []
+    packages_order = [
+        'artellapipe.tools.alembicmanager.widgets',
+        'artellapipe.tools.alembicmanager.core'
+    ]
 
     assetsmanager_importer = importer.init_importer(importer_class=AssetsManager, do_reload=False)
     assetsmanager_importer.import_packages(order=packages_order, only_packages=False)
@@ -69,7 +73,7 @@ def run(project, do_reload=False):
     """
 
     init(do_reload=do_reload)
-    from artellapipe.tools.alembicmanager import alembicmanager
+    from artellapipe.tools.alembicmanager.core import alembicmanager
     win = alembicmanager.run(project=project)
     return win
 
@@ -103,3 +107,21 @@ def get_logging_level():
         return os.environ.get('ARTELLAPIPE_TOOLS_ASSETSMANAGER_LOG_LEVEL')
 
     return os.environ.get('ARTELLAPIPE_TOOLS_ASSETSMANAGER_LOG_LEVEL', 'WARNING')
+
+
+def register_importer(cls):
+    """
+    This function registers given class
+    :param cls: class, Alembic importer class we want to register
+    """
+
+    sys.modules[__name__].__dict__['alembic_importer'] = cls
+
+
+def register_exporter(cls):
+    """
+    This function registers given class
+    :param cls: class, Alembic importer class we want to register
+    """
+
+    sys.modules[__name__].__dict__['alembic_exporter'] = cls

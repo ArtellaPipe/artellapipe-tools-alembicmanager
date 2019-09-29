@@ -86,8 +86,8 @@ class AlembicManager(window.ArtellaWindow, object):
         self.main_layout.addWidget(self._stack)
 
         self._alembic_group_widget = alembicgroup.AlembicGroup()
-        self._alembic_exporter = getattr(sys.modules[__name__], 'exporter')(project=self._project)
-        self._alembic_importer = getattr(sys.modules[__name__], 'importer')(project=self._project)
+        self._alembic_exporter = getattr(sys.modules[artellapipe.tools.alembicmanager.__name__], 'alembic_exporter')(project=self._project)
+        self._alembic_importer = getattr(sys.modules[artellapipe.tools.alembicmanager.__name__], 'alembic_importer')(project=self._project)
 
         self._stack.addWidget(self._alembic_group_widget)
         self._stack.addWidget(self._alembic_exporter)
@@ -144,24 +144,6 @@ class AlembicManager(window.ArtellaWindow, object):
 
         logger.warning(warning_msg)
         self.show_warning_message(warning_msg)
-
-
-def register_importer(cls):
-    """
-    This function registers given class
-    :param cls: class, Alembic importer class we want to register
-    """
-
-    sys.modules[__name__].__dict__['importer'] = cls
-
-
-def register_exporter(cls):
-    """
-    This function registers given class
-    :param cls: class, Alembic importer class we want to register
-    """
-
-    sys.modules[__name__].__dict__['exporter'] = cls
 
 
 def run(project):
