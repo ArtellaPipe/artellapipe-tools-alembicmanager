@@ -25,11 +25,16 @@ from tpQtLib.widgets import splitters
 
 import artellapipe.tools.alembicmanager
 from artellapipe.utils import resource
-from artellapipe.tools.alembicmanager.core import defines
 
 logging.config.fileConfig(artellapipe.tools.alembicmanager.get_logging_config(), disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
 logger.setLevel(artellapipe.tools.alembicmanager.get_logging_level())
+
+# =====================================================================================================================
+
+ALEMBIC_GROUP_SUFFIX = '_ABCGroup'
+
+# =====================================================================================================================
 
 
 class AlembicGroup(base.BaseWidget, object):
@@ -118,8 +123,8 @@ class AlembicGroup(base.BaseWidget, object):
         if not name:
             name = AlembicGroup.get_alembic_group_name_from_node_name(sel[0])
 
-        if not name.endswith(defines.ALEMBIC_GROUP_SUFFIX):
-            name += defines.ALEMBIC_GROUP_SUFFIX
+        if not name.endswith(ALEMBIC_GROUP_SUFFIX):
+            name += ALEMBIC_GROUP_SUFFIX
 
         if tp.Dcc.object_exists(name):
             res = tp.Dcc.confirm_dialog(

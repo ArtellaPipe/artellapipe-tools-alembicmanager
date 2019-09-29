@@ -32,8 +32,6 @@ import artellapipe.tools.alembicmanager
 from artellapipe.core import artellalib
 from artellapipe.utils import tag, resource, alembic
 from artellapipe.gui import waiter, spinner
-from artellapipe.tools.alembicmanager import alembicmanager
-from artellapipe.tools.alembicmanager.core import defines
 from artellapipe.tools.alembicmanager.widgets import alembicgroup
 
 logging.config.fileConfig(artellapipe.tools.alembicmanager.get_logging_config(), disable_existing_loggers=False)
@@ -132,7 +130,7 @@ class AlembicExporter(base.BaseWidget, object):
 
         export_layout = QHBoxLayout()
         self._export_btn = QPushButton('Export')
-        self._export_btn.setIcon(artellapipe.resource.icon('export'))
+        self._export_btn.setIcon(resource.ResourceManager.instance().icon('export'))
         self._export_btn.setEnabled(False)
         export_layout.addItem(QSpacerItem(25, 0, QSizePolicy.Fixed, QSizePolicy.Fixed))
         export_layout.addWidget(self._export_btn)
@@ -272,7 +270,7 @@ class AlembicExporter(base.BaseWidget, object):
 
         self._export_btn.setEnabled(False)
 
-        filtered_sets = filter(lambda x: x.endswith(defines.ALEMBIC_GROUP_SUFFIX), tp.Dcc.list_nodes(node_type='objectSet'))
+        filtered_sets = filter(lambda x: x.endswith(alembicgroup.ALEMBIC_GROUP_SUFFIX), tp.Dcc.list_nodes(node_type='objectSet'))
         filtered_sets.insert(0, '')
         self._alembic_groups_combo.blockSignals(True)
         try:
@@ -663,7 +661,7 @@ class AlembicExporter(base.BaseWidget, object):
         else:
             export_name = set_text
 
-        export_name = export_name.replace(defines.ALEMBIC_GROUP_SUFFIX, '')
+        export_name = export_name.replace(alembicgroup.ALEMBIC_GROUP_SUFFIX, '')
 
         abc_name = self._name_line.text()
         if not abc_name:
@@ -977,5 +975,4 @@ class AlembicExporterModelHires(AlembicExporterNode, object):
         super(AlembicExporterModelHires, self).__init__(name=name, parent=parent)
 
 
-alembicmanager.register_exporter(AlembicExporter)
-
+artellapipe.tools.alembicmanager.register_exporter(AlembicExporter)

@@ -29,8 +29,7 @@ from tpQtLib.widgets import splitters
 
 import artellapipe.tools.alembicmanager
 from artellapipe.utils import resource, alembic
-from artellapipe.tools.alembicmanager import alembicmanager
-from artellapipe.tools.alembicmanager.core import defines
+from artellapipe.tools.alembicmanager.widgets import alembicgroup
 
 if tp.is_maya():
     import tpMayaLib as maya
@@ -142,10 +141,10 @@ class AlembicImporter(base.BaseWidget, object):
         buttons_layout.setSpacing(2)
         self.main_layout.addLayout(buttons_layout)
         self._import_btn = QPushButton('Import')
-        self._import_btn.setIcon(artellapipe.resource.icon('import'))
+        self._import_btn.setIcon(resource.ResourceManager.instance().icon('import'))
         self._import_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self._reference_btn = QPushButton('Reference')
-        self._reference_btn.setIcon(artellapipe.resource.icon('reference'))
+        self._reference_btn.setIcon(resource.ResourceManager.instance().icon('reference'))
         self._reference_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         buttons_layout.addWidget(self._import_btn)
         buttons_layout.addWidget(self._reference_btn)
@@ -269,7 +268,7 @@ class AlembicImporter(base.BaseWidget, object):
         Internal function that updates the list of alembic groups
         """
 
-        filtered_sets = filter(lambda x: x.endswith(defines.ALEMBIC_GROUP_SUFFIX), tp.Dcc.list_nodes(node_type='objectSet'))
+        filtered_sets = filter(lambda x: x.endswith(alembicgroup.ALEMBIC_GROUP_SUFFIX), tp.Dcc.list_nodes(node_type='objectSet'))
         filtered_sets.insert(0, '')
         self.alembic_groups_combo.blockSignals(True)
         try:
@@ -680,10 +679,9 @@ class HoudiniAlembicImporter(AlembicImporter, object):
 
 
 if tp.is_maya():
-    alembicmanager.register_importer(MayaAlembicImporter)
+    artellapipe.tools.alembicmanager.register_importer(MayaAlembicImporter)
 elif tp.is_houdini():
-    alembicmanager.register_importer(HoudiniAlembicImporter)
+    artellapipe.tools.alembicmanager.register_importer(HoudiniAlembicImporter)
 else:
-    alembicmanager.register_importer(AlembicImporter)
-
+    artellapipe.tools.alembicmanager.register_importer(AlembicImporter)
 
