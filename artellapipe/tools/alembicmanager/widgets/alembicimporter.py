@@ -47,7 +47,6 @@ class AlembicImporter(base.BaseWidget, object):
     def __init__(self, project, parent=None):
 
         self._project = project
-        
         super(AlembicImporter, self).__init__(parent=parent)
 
     def ui(self):
