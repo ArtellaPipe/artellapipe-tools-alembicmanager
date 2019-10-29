@@ -1,0 +1,7 @@
+artellapipe.tools.alembicmanager.widgets.alembicimporter module
+===============================================================
+
+.. automodule:: artellapipe.tools.alembicmanager.widgets.alembicimporter
+   :members:
+   :undoc-members:
+   :show-inheritance:

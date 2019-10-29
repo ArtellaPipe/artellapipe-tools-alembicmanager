@@ -1,0 +1,7 @@
+artellapipe.tools.alembicmanager.core.alembicmanager module
+===========================================================
+
+.. automodule:: artellapipe.tools.alembicmanager.core.alembicmanager
+   :members:
+   :undoc-members:
+   :show-inheritance:

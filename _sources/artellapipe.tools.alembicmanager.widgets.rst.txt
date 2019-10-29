@@ -1,0 +1,19 @@
+artellapipe.tools.alembicmanager.widgets package
+================================================
+
+Submodules
+----------
+
+.. toctree::
+
+   artellapipe.tools.alembicmanager.widgets.alembicexporter
+   artellapipe.tools.alembicmanager.widgets.alembicgroup
+   artellapipe.tools.alembicmanager.widgets.alembicimporter
+
+Module contents
+---------------
+
+.. automodule:: artellapipe.tools.alembicmanager.widgets
+   :members:
+   :undoc-members:
+   :show-inheritance:
