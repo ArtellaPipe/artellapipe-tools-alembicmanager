@@ -114,7 +114,8 @@ class AlembicExporter(base.BaseWidget, object):
         self._export_path_btn = QPushButton()
         self._export_path_btn.setIcon(folder_icon)
         self._export_path_btn.setIconSize(QSize(18, 18))
-        self._export_path_btn.setStyleSheet("background-color: rgba(255, 255, 255, 0); border: 0px solid rgba(255,255,255,0);")
+        self._export_path_btn.setStyleSheet(
+            "background-color: rgba(255, 255, 255, 0); border: 0px solid rgba(255,255,255,0);")
         export_path_layout.addWidget(self._export_path_line)
         export_path_layout.addWidget(self._export_path_btn)
         buttons_layout.addWidget(export_path_lbl, 4, 0, 1, 1, Qt.AlignRight)
@@ -178,7 +179,7 @@ class AlembicExporter(base.BaseWidget, object):
         """
 
         if not tp.is_maya():
-            logger.warning('DCC {} does not supports the retrieving of Alembic Group Nodes!'.format(tp.Dcc.get_name()))
+            LOGGER.warning('DCC {} does not supports the retrieving of Alembic Group Nodes!'.format(tp.Dcc.get_name()))
             return None
 
         import maya.cmds as cmds
@@ -223,7 +224,8 @@ class AlembicExporter(base.BaseWidget, object):
         if not object_to_export or not tp.Dcc.object_exists(object_to_export):
             object_to_export = tp.Dcc.selected_nodes(False)
             if not object_to_export:
-                self.show_warning.emit('Impossible to export Alembic from non-existent object {}'.format(object_to_export))
+                self.show_warning.emit(
+                    'Impossible to export Alembic from non-existent object {}'.format(object_to_export))
                 return
             object_to_export = object_to_export[0]
 
@@ -268,7 +270,8 @@ class AlembicExporter(base.BaseWidget, object):
 
         self._export_btn.setEnabled(False)
 
-        filtered_sets = filter(lambda x: x.endswith(alembicgroup.ALEMBIC_GROUP_SUFFIX), tp.Dcc.list_nodes(node_type='objectSet'))
+        filtered_sets = filter(lambda x: x.endswith(
+            alembicgroup.ALEMBIC_GROUP_SUFFIX), tp.Dcc.list_nodes(node_type='objectSet'))
         filtered_sets.insert(0, '')
         self._alembic_groups_combo.blockSignals(True)
         try:
@@ -314,7 +317,7 @@ class AlembicExporter(base.BaseWidget, object):
             except Exception:
                 pass
         if not tag_info:
-            logger.warning('Node has not valid tag data: {}'.format(tag_node))
+            LOGGER.warning('Node has not valid tag data: {}'.format(tag_node))
             return
 
         if not tp.Dcc.attribute_exists(node=attr_node, attribute_name='tag_info'):
@@ -334,7 +337,7 @@ class AlembicExporter(base.BaseWidget, object):
             except Exception:
                 pass
         if not tag_info:
-            logger.warning('Node has not valid tag data: {}'.format(tag_node))
+            LOGGER.warning('Node has not valid tag data: {}'.format(tag_node))
             return
 
         return tag_info
@@ -434,7 +437,7 @@ class AlembicExporter(base.BaseWidget, object):
             dismiss_string='No'
         )
         if res != 'Yes':
-            logger.debug('Aborting Alembic Export operation ...')
+            LOGGER.debug('Aborting Alembic Export operation ...')
             return
 
         self._export_alembics(export_info)
@@ -463,14 +466,15 @@ class AlembicExporter(base.BaseWidget, object):
             if os.path.isfile(export_path):
                 res = tp.Dcc.confirm_dialog(
                     title='Alembic File already exits!',
-                    message='Are you sure you want to overwrite already existing Alembic File?\n\n{}'.format(export_path),
+                    message='Are you sure you want to overwrite already existing Alembic File?\n\n{}'.format(
+                        export_path),
                     button=['Yes', 'No'],
                     default_button='Yes',
                     cancel_button='No',
                     dismiss_string='No'
                 )
                 if res != 'Yes':
-                    logger.debug('Aborting Alembic Export operation ...')
+                    LOGGER.debug('Aborting Alembic Export operation ...')
                     return
 
             export_list = list()
@@ -549,7 +553,7 @@ class AlembicExporter(base.BaseWidget, object):
                 writeCreases=True
             )
             if not valid_alembic:
-                logger.warning('Error while exporting Alembic file: {}'.format(export_path))
+                LOGGER.warning('Error while exporting Alembic file: {}'.format(export_path))
                 return
 
             tag_json_file = abc_node.name.replace('.abc', '_abc.info')
@@ -592,7 +596,7 @@ class AlembicExporter(base.BaseWidget, object):
         abc_group_objs = self.get_alembic_group_nodes(set_text, show_error)
         if not abc_group_objs:
             if set_text != '':
-                logger.warning('Selected Alembic Group is empty: {}'.format(set_text))
+                LOGGER.warning('Selected Alembic Group is empty: {}'.format(set_text))
             return
 
         exports_dict = dict()
@@ -602,7 +606,8 @@ class AlembicExporter(base.BaseWidget, object):
             if tag_node:
                 attr_exists = tp.Dcc.attribute_exists(node=tag_node, attribute_name='hires')
                 if not attr_exists:
-                    hires_objs = tp.Dcc.list_relatives(node=obj, all_hierarchy=True, full_path=True, relative_type='mesh')
+                    hires_objs = tp.Dcc.list_relatives(
+                        node=obj, all_hierarchy=True, full_path=True, relative_type='mesh')
                     if not hires_objs:
                         obj_meshes = [obj]
                     else:
@@ -610,9 +615,11 @@ class AlembicExporter(base.BaseWidget, object):
                 else:
                     hires_grp = tp.Dcc.list_connections(node=tag_node, attribute_name='hires')
                     if hires_grp and tp.Dcc.object_exists(hires_grp[0]):
-                        hires_objs = tp.Dcc.list_relatives(node=hires_grp, all_hierarchy=True, full_path=True, relative_type='mesh')
+                        hires_objs = tp.Dcc.list_relatives(
+                            node=hires_grp, all_hierarchy=True, full_path=True, relative_type='mesh')
                     else:
-                        hires_objs = tp.Dcc.list_relatives(node=obj, all_hierarchy=True, full_path=True, relative_type='mesh')
+                        hires_objs = tp.Dcc.list_relatives(
+                            node=obj, all_hierarchy=True, full_path=True, relative_type='mesh')
                     if not hires_objs:
                         obj_meshes = [obj]
                     else:
@@ -627,7 +634,7 @@ class AlembicExporter(base.BaseWidget, object):
                     exports_dict[obj].append(o)
 
         if not exports_dict:
-            logger.warning('No objects in Alembic Groups to export')
+            LOGGER.warning('No objects in Alembic Groups to export')
             return
 
         shot_name = self._shot_line.text()
@@ -643,7 +650,7 @@ class AlembicExporter(base.BaseWidget, object):
 
         out_folder = self._export_path_line.text()
         if not os.path.exists(out_folder):
-            logger.warning(
+            LOGGER.warning(
                 'Output Path does not exists: {}. Select a valid one!'.format(out_folder)
             )
             return
@@ -666,10 +673,10 @@ class AlembicExporter(base.BaseWidget, object):
             abc_name = export_name
 
         if shot_name:
-            anim_path = '{}_{}'.format(shot_name, abc_name+'.abc')
+            anim_path = '{}_{}'.format(shot_name, abc_name + '.abc')
             filename = os.path.normpath(os.path.join(out_folder, shot_name, anim_path))
         else:
-            anim_path = '{}'.format(abc_name+'.abc')
+            anim_path = '{}'.format(abc_name + '.abc')
             filename = os.path.normpath(os.path.join(out_folder, anim_path))
 
         anim_node = AlembicNode(path_utils.get_relative_path(filename, self._project.get_path()))
@@ -799,7 +806,7 @@ class AlembicExporterGroupsModel(QAbstractItemModel, object):
         self.beginInsertRows(parent, pos, pos + rows - 1)
         for row in range(rows):
             child_count = parent_node.childCount()
-            child_node = AlembicExporterNode('Untitled'+str(child_count))
+            child_node = AlembicExporterNode('Untitled' + str(child_count))
             success = parent_node.insertChild(pos, child_node)
         self.endInsertRows()
 
@@ -839,6 +846,14 @@ class AlembicExporterNode(object):
 
         if parent is not None:
             parent.addChild(self)
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = value
 
     def attrs(self):
 
@@ -889,15 +904,6 @@ class AlembicExporterNode(object):
         self.model.layoutChanged.emit()
 
         return True
-
-    def name():
-        def fget(self): return self._name
-
-        def fset(self, value): self._name = value
-
-        return locals()
-
-    name = property(**name())
 
     def child(self, row):
         return self._children[row]

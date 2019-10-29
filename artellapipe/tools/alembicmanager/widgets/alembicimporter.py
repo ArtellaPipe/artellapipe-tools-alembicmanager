@@ -189,7 +189,8 @@ class AlembicImporter(base.BaseWidget, object):
             return None
 
         abc_name = os.path.basename(alembic_path).split('.')[0]
-        tag_json_file = os.path.join(os.path.dirname(alembic_path), os.path.basename(alembic_path).replace('.abc', '_abc.info'))
+        tag_json_file = os.path.join(
+            os.path.dirname(alembic_path), os.path.basename(alembic_path).replace('.abc', '_abc.info'))
         if not os.path.isfile(tag_json_file):
             LOGGER.warning('No Alembic Info file found!')
             return
@@ -208,7 +209,8 @@ class AlembicImporter(base.BaseWidget, object):
         if not namespace:
             namespace = abc_name
 
-        new_nodes = alembic.reference_alembic(project=project, alembic_file=alembic_path, namespace=namespace, fix_path=fix_path)
+        new_nodes = alembic.reference_alembic(
+            project=project, alembic_file=alembic_path, namespace=namespace, fix_path=fix_path)
         if not new_nodes:
             LOGGER.warning('Error while reference Alembic file: {}'.format(alembic_path))
             return
@@ -266,7 +268,8 @@ class AlembicImporter(base.BaseWidget, object):
         Internal function that updates the list of alembic groups
         """
 
-        filtered_sets = filter(lambda x: x.endswith(alembicgroup.ALEMBIC_GROUP_SUFFIX), tp.Dcc.list_nodes(node_type='objectSet'))
+        filtered_sets = filter(lambda x: x.endswith(
+            alembicgroup.ALEMBIC_GROUP_SUFFIX), tp.Dcc.list_nodes(node_type='objectSet'))
         filtered_sets.insert(0, '')
         self.alembic_groups_combo.blockSignals(True)
         try:
@@ -302,12 +305,14 @@ class AlembicImporter(base.BaseWidget, object):
         """
 
         shot_name = self._shot_line.text()
-        abc_folder = os.path.normpath(os.path.join(self._project.get_path(), shot_name)) if shot_name != 'unresolved' else self._project.get_path()
+        abc_folder = os.path.normpath(os.path.join(
+            self._project.get_path(), shot_name)) if shot_name != 'unresolved' else self._project.get_path()
 
         pattern = 'Alembic Files (*.abc)'
         if tp.is_houdini():
             pattern = '*.abc'
-        abc_file = tp.Dcc.select_file_dialog(title='Select Alembic to Import', start_directory=abc_folder, pattern=pattern)
+        abc_file = tp.Dcc.select_file_dialog(
+            title='Select Alembic to Import', start_directory=abc_folder, pattern=pattern)
         if abc_file:
             self._alembic_path_line.setText(abc_file)
 
@@ -319,12 +324,14 @@ class AlembicImporter(base.BaseWidget, object):
 
         abc_file = self._alembic_path_line.text()
         if not abc_file or not os.path.isfile(abc_file):
-            tp.Dcc.confirm_dialog(title='Error', message='No Alembic File is selected or file is not currently available in disk')
+            tp.Dcc.confirm_dialog(
+                title='Error', message='No Alembic File is selected or file is not currently available in disk')
             return None
 
         sel_set = self.alembic_groups_combo.currentText()
         if self._merge_radio.isChecked() and not sel_set:
-            tp.Dcc.confirm_dialog(title='Error', message='No Alembic Group selected. Please create the Alembic Group first and retry')
+            tp.Dcc.confirm_dialog(
+                title='Error', message='No Alembic Group selected. Please create the Alembic Group first and retry')
             return None
 
         nodes = None
@@ -369,7 +376,8 @@ class AlembicImporter(base.BaseWidget, object):
                 parent = sel[0]
             else:
                 parent = root_to_add
-            reference_nodes = self._import_alembic(alembic_file=abc_file, valid_tag_info=valid_tag_info, nodes=nodes, parent=parent)
+            reference_nodes = self._import_alembic(
+                alembic_file=abc_file, valid_tag_info=valid_tag_info, nodes=nodes, parent=parent)
         reference_nodes = python.force_list(reference_nodes)
 
         added_tag = False
@@ -417,7 +425,8 @@ class AlembicImporter(base.BaseWidget, object):
         """
 
         if valid_tag_info:
-            res = alembic.import_alembic(project=self._project, alembic_file=alembic_file, mode='import', nodes=nodes, parent=parent)
+            res = alembic.import_alembic(
+                project=self._project, alembic_file=alembic_file, mode='import', nodes=nodes, parent=parent)
         else:
             res = alembic.import_alembic(project=self._project, alembic_file=alembic_file, mode='import')
 
@@ -468,7 +477,8 @@ class MayaAlembicImporter(AlembicImporter, object):
             LOGGER.warning('Alembic file {} does not exits!'.format(alembic_path))
             return None
 
-        tag_json_file = os.path.join(os.path.dirname(alembic_path), os.path.basename(alembic_path).replace('.abc', '_abc.info'))
+        tag_json_file = os.path.join(
+            os.path.dirname(alembic_path), os.path.basename(alembic_path).replace('.abc', '_abc.info'))
         valid_tag_info = True
         if os.path.isfile(tag_json_file):
             with open(tag_json_file, 'r') as f:
@@ -477,7 +487,9 @@ class MayaAlembicImporter(AlembicImporter, object):
                 LOGGER.warning('No Alembic Info loaded!')
                 valid_tag_info = False
         else:
-            LOGGER.warning('No Alembic Info file found! Take into account that imported Alembic is not supported by our current pipeline!')
+            LOGGER.warning(
+                'No Alembic Info file found! '
+                'Take into account that imported Alembic is not supported by our current pipeline!')
             valid_tag_info = False
 
         if not parent:
@@ -486,7 +498,9 @@ class MayaAlembicImporter(AlembicImporter, object):
             if not tp.Dcc.object_exists(parent):
                 parent = tp.Dcc.create_empty_group(name=parent)
             else:
-                LOGGER.warning('Impossible to import Alembic into scene because node named "{}" already exists in the scene!'.format(parent))
+                LOGGER.warning(
+                    'Impossible to import Alembic into scene because'
+                    ' node named "{}" already exists in the scene!'.format(parent))
                 return
 
         if parent and valid_tag_info:
@@ -494,7 +508,8 @@ class MayaAlembicImporter(AlembicImporter, object):
 
         track_nodes = maya_scene.TrackNodes()
         track_nodes.load()
-        valid_import = alembic.import_alembic(project, alembic_path, mode='import', nodes=None, parent=parent, fix_path=fix_path)
+        valid_import = alembic.import_alembic(
+            project, alembic_path, mode='import', nodes=None, parent=parent, fix_path=fix_path)
 
         if not valid_import:
             return
@@ -514,7 +529,8 @@ class MayaAlembicImporter(AlembicImporter, object):
         :param fix_path: bool
         """
 
-        res = AlembicImporter.reference_alembic(project=project, alembic_path=alembic_path, namespace=namespace, fix_path=fix_path)
+        res = AlembicImporter.reference_alembic(
+            project=project, alembic_path=alembic_path, namespace=namespace, fix_path=fix_path)
 
         # maya.cmds.viewFit(res, animate=True)
 
@@ -573,7 +589,8 @@ class HoudiniAlembicImporter(AlembicImporter, object):
             LOGGER.warning('Alembic file {} does not exits!'.format(alembic_path))
             return None
 
-        tag_json_file = os.path.join(os.path.dirname(alembic_path), os.path.basename(alembic_path).replace('.abc', '_abc.info'))
+        tag_json_file = os.path.join(
+            os.path.dirname(alembic_path), os.path.basename(alembic_path).replace('.abc', '_abc.info'))
         valid_tag_info = True
         if os.path.isfile(tag_json_file):
             with open(tag_json_file, 'r') as f:
@@ -582,7 +599,9 @@ class HoudiniAlembicImporter(AlembicImporter, object):
                 LOGGER.warning('No Alembic Info loaded!')
                 valid_tag_info = False
         else:
-            LOGGER.warning('No Alembic Info file found! Take into account that imported Alembic is not supported by our current pipeline!')
+            LOGGER.warning(
+                'No Alembic Info file found! Take into account that imported Alembic '
+                'is not supported by our current pipeline!')
             valid_tag_info = False
 
         n = hou.node('obj')
@@ -594,7 +613,8 @@ class HoudiniAlembicImporter(AlembicImporter, object):
         if parent and valid_tag_info:
             cls._add_tag_info_data(project=project, tag_info=tag_info, attr_node=parent)
 
-        res = alembic.import_alembic(project, alembic_path, mode='import', nodes=None, parent=parent, fix_path=fix_path)
+        res = alembic.import_alembic(
+            project, alembic_path, mode='import', nodes=None, parent=parent, fix_path=fix_path)
 
         return res
 
@@ -657,9 +677,11 @@ class HoudiniAlembicImporter(AlembicImporter, object):
         """
 
         if valid_tag_info:
-            res = alembic.import_alembic(project=self._project, alembic_file=alembic_file, mode='import', nodes=nodes, parent=parent)
+            res = alembic.import_alembic(
+                project=self._project, alembic_file=alembic_file, mode='import', nodes=nodes, parent=parent)
         else:
-            res = alembic.import_alembic(project=self._project, alembic_file=alembic_file, mode='import', parent=parent)
+            res = alembic.import_alembic(
+                project=self._project, alembic_file=alembic_file, mode='import', parent=parent)
 
         return res
 

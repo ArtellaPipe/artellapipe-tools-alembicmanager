@@ -7,7 +7,7 @@ Module that contains general tests for artellapipe-tools-alembicmanager
 
 import pytest
 
-from artellapipe.tools.bugtracker import __version__
+from artellapipe.tools.alembicmanager import __version__
 
 
 def test_version():
