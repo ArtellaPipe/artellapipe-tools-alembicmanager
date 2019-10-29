@@ -34,9 +34,7 @@ from artellapipe.utils import tag, resource, alembic
 from artellapipe.gui import waiter, spinner
 from artellapipe.tools.alembicmanager.widgets import alembicgroup
 
-logging.config.fileConfig(artellapipe.tools.alembicmanager.get_logging_config(), disable_existing_loggers=False)
-logger = logging.getLogger(__name__)
-logger.setLevel(artellapipe.tools.alembicmanager.get_logging_level())
+LOGGER = logging.getLogger()
 
 
 class AlembicExporter(base.BaseWidget, object):
@@ -103,7 +101,7 @@ class AlembicExporter(base.BaseWidget, object):
         buttons_layout.addWidget(frame_range_lbl, 3, 0, 1, 1, Qt.AlignRight)
         buttons_layout.addWidget(frame_range_widget, 3, 1)
 
-        folder_icon = resource.ResourceManager.instance().icon('folder')
+        folder_icon = resource.ResourceManager().icon('folder')
         export_path_layout = QHBoxLayout()
         export_path_layout.setContentsMargins(2, 2, 2, 2)
         export_path_layout.setSpacing(2)
@@ -130,7 +128,7 @@ class AlembicExporter(base.BaseWidget, object):
 
         export_layout = QHBoxLayout()
         self._export_btn = QPushButton('Export')
-        self._export_btn.setIcon(resource.ResourceManager.instance().icon('export'))
+        self._export_btn.setIcon(resource.ResourceManager().icon('export'))
         self._export_btn.setEnabled(False)
         export_layout.addItem(QSpacerItem(25, 0, QSizePolicy.Fixed, QSizePolicy.Fixed))
         export_layout.addWidget(self._export_btn)
@@ -541,7 +539,7 @@ class AlembicExporter(base.BaseWidget, object):
 
             artellalib.lock_file(export_path, True)
 
-            valid_alembic = alembic.export(
+            valid_alembic = alembic.export_alembic(
                 root=export_list,
                 alembicFile=export_path,
                 frameRange=[[float(self._start.value()), float(self._end.value())]],
@@ -966,7 +964,7 @@ class AlembicNode(AlembicExporterNode, object):
         super(AlembicNode, self).__init__(name=name, parent=parent)
 
     def resource(self):
-        path = resource.ResourceManager.instance().get('icons', 'alembic_white.png')
+        path = resource.ResourceManager().get('icons', 'alembic_white.png')
         return path
 
 

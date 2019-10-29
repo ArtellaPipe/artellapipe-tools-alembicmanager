@@ -2,4 +2,4 @@
 # artellapipe-tools-alembicmanager requirements file
 # ===================================================================
 
-artellapipe-core
+artellapipe

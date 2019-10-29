@@ -23,15 +23,13 @@ import tpDccLib as tp
 from tpQtLib.core import base
 from tpQtLib.widgets import splitters
 
-import artellapipe.tools.alembicmanager
 from artellapipe.utils import resource
 
-logging.config.fileConfig(artellapipe.tools.alembicmanager.get_logging_config(), disable_existing_loggers=False)
-logger = logging.getLogger(__name__)
-logger.setLevel(artellapipe.tools.alembicmanager.get_logging_level())
+LOGGER = logging.getLogger()
 
 # =====================================================================================================================
 
+# TODO: Move this into tool configuratoin file
 ALEMBIC_GROUP_SUFFIX = '_ABCGroup'
 
 # =====================================================================================================================
@@ -44,8 +42,8 @@ class AlembicGroup(base.BaseWidget, object):
     def ui(self):
         super(AlembicGroup, self).ui()
 
-        add_icon = resource.ResourceManager.instance().icon('add')
-        delete_icon = resource.ResourceManager.instance().icon('delete')
+        add_icon = resource.ResourceManager().icon('add')
+        delete_icon = resource.ResourceManager().icon('delete')
 
         group_layout = QGridLayout()
         group_layout.setContentsMargins(2, 2, 2, 2)
@@ -108,7 +106,7 @@ class AlembicGroup(base.BaseWidget, object):
         """
 
         if not tp.is_maya():
-            logger.warning('DCC {} does not supports the creation of Alembic groups!'.format(tp.Dcc.get_name()))
+            LOGGER.warning('DCC {} does not supports the creation of Alembic groups!'.format(tp.Dcc.get_name()))
             return None
 
         import maya.cmds as cmds
@@ -138,7 +136,7 @@ class AlembicGroup(base.BaseWidget, object):
             if res and res == 'Yes':
                 tp.Dcc.delete_object(name)
 
-        logger.debug('Creating Alembic Group with name: {}'.format(name))
+        LOGGER.debug('Creating Alembic Group with name: {}'.format(name))
 
         full_sel = tp.Dcc.list_relatives(node=sel, all_hierarchy=True, full_path=True) or []
         main_sel = list()
@@ -167,13 +165,13 @@ class AlembicGroup(base.BaseWidget, object):
         """
 
         if not tp.is_maya():
-            logger.warning('DCC {} does not supports the creation of Alembic groups!'.format(tp.Dcc.get_name()))
+            LOGGER.warning('DCC {} does not supports the creation of Alembic groups!'.format(tp.Dcc.get_name()))
             return None
 
         import maya.cmds as cmds
 
         all_sets = cmds.listSets(allSets=True)
-        abc_sets = [s for s in all_sets if s.endswith(defines.ALEMBIC_GROUP_SUFFIX)]
+        abc_sets = [s for s in all_sets if s.endswith(ALEMBIC_GROUP_SUFFIX)]
 
         res = tp.Dcc.confirm_dialog(
             title='Removing Alembic Groups!',

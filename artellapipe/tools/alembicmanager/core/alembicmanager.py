@@ -22,33 +22,24 @@ from tpQtLib.widgets import stack, splitters
 
 import artellapipe.tools.alembicmanager
 from artellapipe.utils import resource
-from artellapipe.gui import window
+from artellapipe.core import tool
 
-logging.config.fileConfig(artellapipe.tools.alembicmanager.get_logging_config(), disable_existing_loggers=False)
-logger = logging.getLogger(__name__)
-logger.setLevel(artellapipe.tools.alembicmanager.get_logging_level())
+LOGGER = logging.getLogger()
 
 
-class AlembicManager(window.ArtellaWindow, object):
+class AlembicManager(tool.Tool, object):
 
-    LOGO_NAME = 'alembicmanager_logo'
-
-    def __init__(self, project):
-        super(AlembicManager, self).__init__(
-            project=project,
-            name='ArtellaAlembicManager',
-            title='Alembic Manager',
-            size=(550, 650)
-        )
+    def __init__(self, project, config):
+        super(AlembicManager, self).__init__(project=project, config=config)
 
     def ui(self):
         super(AlembicManager, self).ui()
 
         from artellapipe.tools.alembicmanager.widgets import alembicgroup
 
-        alembic_icon = resource.ResourceManager.instance().icon('alembic_white')
-        export_icon = resource.ResourceManager.instance().icon('export')
-        import_icon = resource.ResourceManager.instance().icon('import')
+        alembic_icon = resource.ResourceManager().icon('alembic_white')
+        export_icon = resource.ResourceManager().icon('export')
+        import_icon = resource.ResourceManager().icon('import')
 
         buttons_layout = QHBoxLayout()
         buttons_layout.setContentsMargins(2, 2, 2, 2)
@@ -86,8 +77,10 @@ class AlembicManager(window.ArtellaWindow, object):
         self.main_layout.addWidget(self._stack)
 
         self._alembic_group_widget = alembicgroup.AlembicGroup()
-        self._alembic_exporter = getattr(sys.modules[artellapipe.tools.alembicmanager.__name__], 'alembic_exporter')(project=self._project)
-        self._alembic_importer = getattr(sys.modules[artellapipe.tools.alembicmanager.__name__], 'alembic_importer')(project=self._project)
+        self._alembic_exporter = getattr(
+            sys.modules[artellapipe.tools.alembicmanager.__name__], 'alembic_exporter')(project=self.project)
+        self._alembic_importer = getattr(
+            sys.modules[artellapipe.tools.alembicmanager.__name__], 'alembic_importer')(project=self.project)
 
         self._stack.addWidget(self._alembic_group_widget)
         self._stack.addWidget(self._alembic_exporter)
@@ -133,7 +126,7 @@ class AlembicManager(window.ArtellaWindow, object):
         :param warning_msg: str
         """
 
-        logger.debug(warning_msg)
+        LOGGER.debug(warning_msg)
         self.show_ok_message(warning_msg)
 
     def _on_show_warning(self, warning_msg):
@@ -142,12 +135,5 @@ class AlembicManager(window.ArtellaWindow, object):
         :param warning_msg: str
         """
 
-        logger.warning(warning_msg)
+        LOGGER.warning(warning_msg)
         self.show_warning_message(warning_msg)
-
-
-def run(project):
-    win = AlembicManager(project=project)
-    win.show()
-
-    return win

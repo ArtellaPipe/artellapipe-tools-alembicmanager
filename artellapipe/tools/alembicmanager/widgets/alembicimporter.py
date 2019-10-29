@@ -37,9 +37,7 @@ if tp.is_maya():
 elif tp.is_houdini():
     import hou
 
-logging.config.fileConfig(artellapipe.tools.alembicmanager.get_logging_config(), disable_existing_loggers=False)
-logger = logging.getLogger(__name__)
-logger.setLevel(artellapipe.tools.alembicmanager.get_logging_level())
+LOGGER = logging.getLogger()
 
 
 class AlembicImporter(base.BaseWidget, object):
@@ -65,7 +63,7 @@ class AlembicImporter(base.BaseWidget, object):
         shot_name_lbl.setVisible(False)
         self._shot_line.setVisible(False)
 
-        folder_icon = resource.ResourceManager.instance().icon('folder')
+        folder_icon = resource.ResourceManager().icon('folder')
         alembic_path_layout = QHBoxLayout()
         alembic_path_layout.setContentsMargins(2, 2, 2, 2)
         alembic_path_layout.setSpacing(2)
@@ -141,10 +139,10 @@ class AlembicImporter(base.BaseWidget, object):
         buttons_layout.setSpacing(2)
         self.main_layout.addLayout(buttons_layout)
         self._import_btn = QPushButton('Import')
-        self._import_btn.setIcon(resource.ResourceManager.instance().icon('import'))
+        self._import_btn.setIcon(resource.ResourceManager().icon('import'))
         self._import_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self._reference_btn = QPushButton('Reference')
-        self._reference_btn.setIcon(resource.ResourceManager.instance().icon('reference'))
+        self._reference_btn.setIcon(resource.ResourceManager().icon('reference'))
         self._reference_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         buttons_layout.addWidget(self._import_btn)
         buttons_layout.addWidget(self._reference_btn)
@@ -187,19 +185,19 @@ class AlembicImporter(base.BaseWidget, object):
         """
 
         if not alembic_path or not os.path.isfile(alembic_path):
-            logger.warning('Alembic file {} does not exits!'.format(alembic_path))
+            LOGGER.warning('Alembic file {} does not exits!'.format(alembic_path))
             return None
 
         abc_name = os.path.basename(alembic_path).split('.')[0]
         tag_json_file = os.path.join(os.path.dirname(alembic_path), os.path.basename(alembic_path).replace('.abc', '_abc.info'))
         if not os.path.isfile(tag_json_file):
-            logger.warning('No Alembic Info file found!')
+            LOGGER.warning('No Alembic Info file found!')
             return
 
         with open(tag_json_file, 'r') as f:
             tag_info = json.loads(f.read())
         if not tag_info:
-            logger.warning('No Alembic Info loaded!')
+            LOGGER.warning('No Alembic Info loaded!')
             return
 
         root = tp.Dcc.create_empty_group(name=abc_name)
@@ -212,7 +210,7 @@ class AlembicImporter(base.BaseWidget, object):
 
         new_nodes = alembic.reference_alembic(project=project, alembic_file=alembic_path, namespace=namespace, fix_path=fix_path)
         if not new_nodes:
-            logger.warning('Error while reference Alembic file: {}'.format(alembic_path))
+            LOGGER.warning('Error while reference Alembic file: {}'.format(alembic_path))
             return
         for obj in new_nodes:
             if not tp.Dcc.object_exists(obj):
@@ -340,10 +338,10 @@ class AlembicImporter(base.BaseWidget, object):
             with open(tag_json_file, 'r') as f:
                 tag_info = json.loads(f.read())
             if not tag_info:
-                logger.warning('No Alembic Info loaded!')
+                LOGGER.warning('No Alembic Info loaded!')
                 valid_tag_info = False
         else:
-            logger.warning('No Alembic Info file found!')
+            LOGGER.warning('No Alembic Info file found!')
             valid_tag_info = False
 
         # if not valid_tag_info:
@@ -435,7 +433,7 @@ class AlembicImporter(base.BaseWidget, object):
 
         all_nodes = alembic.reference_alembic(project=self._project, alembic_file=alembic_file, namespace=namespace)
         if not all_nodes:
-            logger.warning('Error while reference Alembic file: {}'.format(alembic_file))
+            LOGGER.warning('Error while reference Alembic file: {}'.format(alembic_file))
             return
         for obj in all_nodes:
             if not tp.Dcc.object_exists(obj):
@@ -467,7 +465,7 @@ class MayaAlembicImporter(AlembicImporter, object):
         """
 
         if not alembic_path or not os.path.isfile(alembic_path):
-            logger.warning('Alembic file {} does not exits!'.format(alembic_path))
+            LOGGER.warning('Alembic file {} does not exits!'.format(alembic_path))
             return None
 
         tag_json_file = os.path.join(os.path.dirname(alembic_path), os.path.basename(alembic_path).replace('.abc', '_abc.info'))
@@ -476,10 +474,10 @@ class MayaAlembicImporter(AlembicImporter, object):
             with open(tag_json_file, 'r') as f:
                 tag_info = json.loads(f.read())
             if not tag_info:
-                logger.warning('No Alembic Info loaded!')
+                LOGGER.warning('No Alembic Info loaded!')
                 valid_tag_info = False
         else:
-            logger.warning('No Alembic Info file found! Take into account that imported Alembic is not supported by our current pipeline!')
+            LOGGER.warning('No Alembic Info file found! Take into account that imported Alembic is not supported by our current pipeline!')
             valid_tag_info = False
 
         if not parent:
@@ -488,7 +486,7 @@ class MayaAlembicImporter(AlembicImporter, object):
             if not tp.Dcc.object_exists(parent):
                 parent = tp.Dcc.create_empty_group(name=parent)
             else:
-                logger.warning('Impossible to import Alembic into scene because node named "{}" already exists in the scene!'.format(parent))
+                LOGGER.warning('Impossible to import Alembic into scene because node named "{}" already exists in the scene!'.format(parent))
                 return
 
         if parent and valid_tag_info:
@@ -572,7 +570,7 @@ class HoudiniAlembicImporter(AlembicImporter, object):
         """
 
         if not alembic_path or not os.path.isfile(alembic_path):
-            logger.warning('Alembic file {} does not exits!'.format(alembic_path))
+            LOGGER.warning('Alembic file {} does not exits!'.format(alembic_path))
             return None
 
         tag_json_file = os.path.join(os.path.dirname(alembic_path), os.path.basename(alembic_path).replace('.abc', '_abc.info'))
@@ -581,10 +579,10 @@ class HoudiniAlembicImporter(AlembicImporter, object):
             with open(tag_json_file, 'r') as f:
                 tag_info = json.loads(f.read())
             if not tag_info:
-                logger.warning('No Alembic Info loaded!')
+                LOGGER.warning('No Alembic Info loaded!')
                 valid_tag_info = False
         else:
-            logger.warning('No Alembic Info file found! Take into account that imported Alembic is not supported by our current pipeline!')
+            LOGGER.warning('No Alembic Info file found! Take into account that imported Alembic is not supported by our current pipeline!')
             valid_tag_info = False
 
         n = hou.node('obj')
@@ -611,7 +609,7 @@ class HoudiniAlembicImporter(AlembicImporter, object):
         :param fix_path: bool
         """
 
-        logger.warning('Alembic Reference is not supported in Houdini!')
+        LOGGER.warning('Alembic Reference is not supported in Houdini!')
         return
 
     @staticmethod
@@ -674,7 +672,7 @@ class HoudiniAlembicImporter(AlembicImporter, object):
         :return:
         """
 
-        logger.warning('Alembic Reference is not supported in Houdini!')
+        LOGGER.warning('Alembic Reference is not supported in Houdini!')
         return
 
 
@@ -684,4 +682,3 @@ elif tp.is_houdini():
     artellapipe.tools.alembicmanager.register_importer(HoudiniAlembicImporter)
 else:
     artellapipe.tools.alembicmanager.register_importer(AlembicImporter)
-
