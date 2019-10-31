@@ -1,7 +1,7 @@
-artellapipe-tools-bugtracker
+artellapipe-tools-alembicmanager
 ============================================================
 
-Tool to report errors during tools usage
+Tool to export and import Alembic cache files
 
 .. image:: https://travis-ci.com/ArtellaPipe/artellapipe-tools-alembicmanager.svg?branch=master&kill_cache=1
     :target: https://travis-ci.com/ArtellaPipe/artellapipe-tools-alembicmanager
