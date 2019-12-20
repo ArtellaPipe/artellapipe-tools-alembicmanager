@@ -1,14 +1,14 @@
 artellapipe.tools.alembicmanager.widgets package
 ================================================
 
-Submodules
-----------
+Subpackages
+-----------
 
 .. toctree::
 
-   artellapipe.tools.alembicmanager.widgets.alembicexporter
-   artellapipe.tools.alembicmanager.widgets.alembicgroup
-   artellapipe.tools.alembicmanager.widgets.alembicimporter
+   artellapipe.tools.alembicmanager.widgets.base
+   artellapipe.tools.alembicmanager.widgets.houdini
+   artellapipe.tools.alembicmanager.widgets.maya
 
 Module contents
 ---------------

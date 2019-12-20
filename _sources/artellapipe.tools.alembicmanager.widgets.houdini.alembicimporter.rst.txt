@@ -1,0 +1,7 @@
+artellapipe.tools.alembicmanager.widgets.houdini.alembicimporter module
+=======================================================================
+
+.. automodule:: artellapipe.tools.alembicmanager.widgets.houdini.alembicimporter
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,17 @@
+artellapipe.tools.alembicmanager.widgets.houdini package
+========================================================
+
+Submodules
+----------
+
+.. toctree::
+
+   artellapipe.tools.alembicmanager.widgets.houdini.alembicimporter
+
+Module contents
+---------------
+
+.. automodule:: artellapipe.tools.alembicmanager.widgets.houdini
+   :members:
+   :undoc-members:
+   :show-inheritance:

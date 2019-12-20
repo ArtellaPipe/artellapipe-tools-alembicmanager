@@ -1,0 +1,17 @@
+artellapipe.tools.alembicmanager.widgets.maya package
+=====================================================
+
+Submodules
+----------
+
+.. toctree::
+
+   artellapipe.tools.alembicmanager.widgets.maya.alembiceimporter
+
+Module contents
+---------------
+
+.. automodule:: artellapipe.tools.alembicmanager.widgets.maya
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+artellapipe.tools.alembicmanager.widgets.maya.alembiceimporter module
+=====================================================================
+
+.. automodule:: artellapipe.tools.alembicmanager.widgets.maya.alembiceimporter
+   :members:
+   :undoc-members:
+   :show-inheritance:

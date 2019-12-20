@@ -1,7 +1,0 @@
-artellapipe.tools.alembicmanager.widgets.alembicgroup module
-============================================================
-
-.. automodule:: artellapipe.tools.alembicmanager.widgets.alembicgroup
-   :members:
-   :undoc-members:
-   :show-inheritance:
