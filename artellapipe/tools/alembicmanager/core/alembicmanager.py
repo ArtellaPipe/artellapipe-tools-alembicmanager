@@ -12,7 +12,6 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
-import sys
 import logging.config
 from functools import partial
 
@@ -20,14 +19,14 @@ from Qt.QtWidgets import *
 
 from tpQtLib.widgets import stack, splitters
 
+import artellapipe
 import artellapipe.tools.alembicmanager
 from artellapipe.utils import resource
-from artellapipe.core import tool
 
 LOGGER = logging.getLogger()
 
 
-class AlembicManager(tool.Tool, object):
+class AlembicManager(artellapipe.Tool, object):
 
     def __init__(self, project, config):
         super(AlembicManager, self).__init__(project=project, config=config)
@@ -35,9 +34,6 @@ class AlembicManager(tool.Tool, object):
     def ui(self):
         super(AlembicManager, self).ui()
 
-        from artellapipe.tools.alembicmanager.widgets import alembicgroup
-
-        alembic_icon = resource.ResourceManager().icon('alembic_white')
         export_icon = resource.ResourceManager().icon('export')
         import_icon = resource.ResourceManager().icon('import')
 
@@ -47,10 +43,6 @@ class AlembicManager(tool.Tool, object):
         self.main_layout.addLayout(buttons_layout)
         self.main_layout.addLayout(splitters.SplitterLayout())
 
-        self._abc_btn = QPushButton('ABC Group')
-        self._abc_btn.setIcon(alembic_icon)
-        self._abc_btn.setMinimumWidth(80)
-        self._abc_btn.setCheckable(True)
         self._exporter_btn = QPushButton('Exporter')
         self._exporter_btn.setIcon(export_icon)
         self._exporter_btn.setMinimumWidth(80)
@@ -60,37 +52,29 @@ class AlembicManager(tool.Tool, object):
         self._importer_btn.setMinimumWidth(80)
         self._importer_btn.setCheckable(True)
         buttons_layout.addItem(QSpacerItem(10, 0, QSizePolicy.Expanding, QSizePolicy.Preferred))
-        buttons_layout.addWidget(self._abc_btn)
         buttons_layout.addWidget(self._exporter_btn)
         buttons_layout.addWidget(self._importer_btn)
         buttons_layout.addItem(QSpacerItem(10, 0, QSizePolicy.Expanding, QSizePolicy.Preferred))
 
         self._buttons_grp = QButtonGroup(self)
         self._buttons_grp.setExclusive(True)
-        self._buttons_grp.addButton(self._abc_btn)
-        self._buttons_grp.addButton(self._exporter_btn)
         self._buttons_grp.addButton(self._exporter_btn)
         self._buttons_grp.addButton(self._importer_btn)
-        self._abc_btn.setChecked(True)
+        self._exporter_btn.setChecked(True)
 
         self._stack = stack.SlidingStackedWidget()
         self.main_layout.addWidget(self._stack)
 
-        self._alembic_group_widget = alembicgroup.AlembicGroup()
-        self._alembic_exporter = getattr(
-            sys.modules[artellapipe.tools.alembicmanager.__name__], 'alembic_exporter')(project=self.project)
-        self._alembic_importer = getattr(
-            sys.modules[artellapipe.tools.alembicmanager.__name__], 'alembic_importer')(project=self.project)
+        self._alembic_exporter = artellapipe.AlembicExporter(project=self.project)
+        self._alembic_importer = artellapipe.AlembicImporter(project=self.project)
 
-        self._stack.addWidget(self._alembic_group_widget)
         self._stack.addWidget(self._alembic_exporter)
         self._stack.addWidget(self._alembic_importer)
 
     def setup_signals(self):
         self._stack.animFinished.connect(self._on_stack_anim_finished)
-        self._abc_btn.clicked.connect(partial(self._on_slide_stack, 0))
-        self._exporter_btn.clicked.connect(partial(self._on_slide_stack, 1))
-        self._importer_btn.clicked.connect(partial(self._on_slide_stack, 2))
+        self._exporter_btn.clicked.connect(partial(self._on_slide_stack, 0))
+        self._importer_btn.clicked.connect(partial(self._on_slide_stack, 1))
         self._alembic_exporter.showWarning.connect(self._on_show_warning)
         self._alembic_exporter.showOk.connect(self._on_show_ok)
         self._alembic_importer.showOk.connect(self._on_show_ok)

@@ -1,3 +1,3 @@
 order = [
-    'artellapipe.tools.alembicmanager.widgets.alembicgroup'
+    'artellapipe.tools.alembicmanager.widgets.base'
 ]
