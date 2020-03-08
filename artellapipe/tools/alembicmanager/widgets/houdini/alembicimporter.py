@@ -16,7 +16,7 @@ import os
 import json
 import logging
 
-import tpDccLib as tp
+import tpDcc as tp
 
 import artellapipe.register
 from artellapipe.tools.alembicmanager.widgets.base import alembicimporter

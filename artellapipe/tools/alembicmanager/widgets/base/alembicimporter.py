@@ -20,19 +20,18 @@ from functools import partial
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
-from tpPyUtils import decorators, python
+from tpDcc.libs.python import decorators, python
 
-import tpDccLib as tp
+import tpDcc as tp
 
-from tpQtLib.core import base
-from tpQtLib.widgets import splitters
+from tpDcc.libs.qt.core import base
+from tpDcc.libs.qt.widgets import splitters
 
 import artellapipe.register
-from artellapipe.utils import resource
 from artellapipe.libs.alembic.core import alembic
 
 if tp.is_maya():
-    import tpMayaLib as maya
+    import tpDcc.dccs.maya as maya
 
 
 LOGGER = logging.getLogger()
@@ -60,7 +59,7 @@ class AlembicImporter(base.BaseWidget, object):
         shot_name_lbl.setVisible(False)
         self._shot_line.setVisible(False)
 
-        folder_icon = resource.ResourceManager().icon('folder')
+        folder_icon = tp.ResourcesMgr().icon('folder')
         alembic_path_layout = QHBoxLayout()
         alembic_path_layout.setContentsMargins(2, 2, 2, 2)
         alembic_path_layout.setSpacing(2)
@@ -122,10 +121,10 @@ class AlembicImporter(base.BaseWidget, object):
         buttons_layout.setSpacing(2)
         self.main_layout.addLayout(buttons_layout)
         self._import_btn = QPushButton('Import')
-        self._import_btn.setIcon(resource.ResourceManager().icon('import'))
+        self._import_btn.setIcon(tp.ResourcesMgr().icon('import'))
         self._import_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self._reference_btn = QPushButton('Reference')
-        self._reference_btn.setIcon(resource.ResourceManager().icon('reference'))
+        self._reference_btn.setIcon(tp.ResourcesMgr().icon('reference'))
         self._reference_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         buttons_layout.addWidget(self._import_btn)
         buttons_layout.addWidget(self._reference_btn)

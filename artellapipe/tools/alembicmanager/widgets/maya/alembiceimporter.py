@@ -16,13 +16,13 @@ import os
 import json
 import logging
 
-import tpDccLib as tp
+import tpDcc as tp
 
 import artellapipe.register
 from artellapipe.tools.alembicmanager.widgets.base import alembicimporter
 
 if tp.is_maya():
-    from tpMayaLib.core import scene as maya_scene
+    from tpDcc.dccs.maya.core import scene as maya_scene
 
 LOGGER = logging.getLogger()
 

@@ -20,18 +20,17 @@ import logging
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
-from tpPyUtils import folder as folder_utils, path as path_utils
+from tpDcc.libs.python import folder as folder_utils, path as path_utils
 
-import tpDccLib as tp
+import tpDcc as tp
 
-from tpQtLib.core import base
-from tpQtLib.widgets import splitters, stack
+from tpDcc.libs.qt.core import base
+from tpDcc.libs.qt.widgets import splitters, stack
 
 import artellapipe.register
 import artellapipe.tools.alembicmanager
 from artellapipe.libs.artella.core import artellalib
 from artellapipe.libs.alembic.core import alembic
-from artellapipe.utils import resource
 from artellapipe.widgets import waiter, spinner
 
 LOGGER = logging.getLogger()
@@ -96,7 +95,7 @@ class AlembicExporter(base.BaseWidget, object):
         buttons_layout.addWidget(frame_range_lbl, 2, 0, 1, 1, Qt.AlignRight)
         buttons_layout.addWidget(frame_range_widget, 2, 1)
 
-        folder_icon = resource.ResourceManager().icon('folder')
+        folder_icon = tp.ResourcesMgr().icon('folder')
         export_path_layout = QHBoxLayout()
         export_path_layout.setContentsMargins(2, 2, 2, 2)
         export_path_layout.setSpacing(2)
@@ -134,7 +133,7 @@ class AlembicExporter(base.BaseWidget, object):
 
         export_layout = QHBoxLayout()
         self._export_btn = QPushButton('Export')
-        self._export_btn.setIcon(resource.ResourceManager().icon('export'))
+        self._export_btn.setIcon(tp.ResourcesMgr().icon('export'))
         self._export_btn.setEnabled(False)
         export_layout.addItem(QSpacerItem(25, 0, QSizePolicy.Fixed, QSizePolicy.Fixed))
         export_layout.addWidget(self._export_btn)
@@ -239,10 +238,10 @@ class AlembicExporter(base.BaseWidget, object):
         if current_scene:
             current_scene = os.path.basename(current_scene)
 
-        shot_regex = artellapipe.ShotsMgr().get_shot_regex()
-        m = shot_regex.match(current_scene)
-        if m:
-            shot_name = m.group(1)
+        # shot_regex = artellapipe.ShotsMgr().get_shot_regex()
+        # m = shot_regex.match(current_scene)
+        # if m:
+        #     shot_name = m.group(1)
 
         self._shot_line.setText(shot_name)
 
