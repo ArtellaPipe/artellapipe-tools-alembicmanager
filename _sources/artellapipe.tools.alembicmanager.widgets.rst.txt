@@ -10,6 +10,13 @@ Subpackages
    artellapipe.tools.alembicmanager.widgets.houdini
    artellapipe.tools.alembicmanager.widgets.maya
 
+Submodules
+----------
+
+.. toctree::
+
+   artellapipe.tools.alembicmanager.widgets.alembicmanager
+
 Module contents
 ---------------
 
