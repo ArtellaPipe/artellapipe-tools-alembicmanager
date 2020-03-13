@@ -1,2 +1,2 @@
 include artellapipe/tools/alembicmanager/__logging__.ini
-include artellapipe/tools/alembicmanager/resources/images/*.*
+recursive-include artellapipe/tools/alembicmanager/resources/* *.*
