@@ -1,2 +1,4 @@
 include artellapipe/tools/alembicmanager/__logging__.ini
 recursive-include artellapipe/tools/alembicmanager/resources/* *.*
+include versioneer.py
+include artellapipe/tools/alembicmanager/_version.py
