@@ -5,6 +5,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    artellapipe.tools.alembicmanager.widgets.base
    artellapipe.tools.alembicmanager.widgets.houdini
@@ -14,6 +15,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    artellapipe.tools.alembicmanager.widgets.alembicmanager
 

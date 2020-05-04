@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    artellapipe.tools.alembicmanager.widgets.base.alembicexporter
    artellapipe.tools.alembicmanager.widgets.base.alembicimporter
