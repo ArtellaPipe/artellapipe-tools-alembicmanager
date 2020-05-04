@@ -25,14 +25,10 @@ from tpDcc.libs.python import decorators, python
 import tpDcc as tp
 
 from tpDcc.libs.qt.core import base
-from tpDcc.libs.qt.widgets import splitters
+from tpDcc.libs.qt.widgets import dividers
 
 import artellapipe.register
 from artellapipe.libs.alembic.core import alembic
-
-if tp.is_maya():
-    import tpDcc.dccs.maya as maya
-
 
 LOGGER = logging.getLogger()
 
@@ -114,7 +110,7 @@ class AlembicImporter(base.BaseWidget, object):
             buttons_layout.addWidget(hou_archive_abc_node_lbl, 5, 0, 1, 1, Qt.AlignRight)
             buttons_layout.addWidget(self._hou_archive_abc_node_cbx, 5, 1)
 
-        self.main_layout.addLayout(splitters.SplitterLayout())
+        self.main_layout.addLayout(dividers.DividerLayout())
 
         buttons_layout = QHBoxLayout()
         buttons_layout.setContentsMargins(2, 2, 2, 2)

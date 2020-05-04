@@ -25,7 +25,7 @@ from tpDcc.libs.python import folder as folder_utils, path as path_utils
 import tpDcc as tp
 
 from tpDcc.libs.qt.core import base
-from tpDcc.libs.qt.widgets import splitters, stack
+from tpDcc.libs.qt.widgets import dividers, stack
 
 import artellapipe.register
 import artellapipe.tools.alembicmanager
@@ -115,7 +115,7 @@ class AlembicExporter(base.BaseWidget, object):
         buttons_layout.addWidget(export_path_lbl, 3, 0, 1, 1, Qt.AlignRight)
         buttons_layout.addWidget(export_path_widget, 3, 1)
 
-        exporter_layout.addLayout(splitters.SplitterLayout())
+        exporter_layout.addLayout(dividers.DividerLayout())
 
         checkboxes_layout = QVBoxLayout()
         checkboxes_layout.setContentsMargins(2, 2, 2, 2)
@@ -129,7 +129,7 @@ class AlembicExporter(base.BaseWidget, object):
         self._export_all_alembics_together_cbx.setChecked(True)
         checkboxes_layout.addWidget(self._export_all_alembics_together_cbx)
 
-        exporter_layout.addLayout(splitters.SplitterLayout())
+        exporter_layout.addLayout(dividers.DividerLayout())
 
         export_layout = QHBoxLayout()
         self._export_btn = QPushButton('Export')

@@ -18,7 +18,7 @@ from functools import partial
 from Qt.QtWidgets import *
 
 import tpDcc
-from tpDcc.libs.qt.widgets import stack, splitters
+from tpDcc.libs.qt.widgets import stack, dividers
 
 import artellapipe
 import artellapipe.tools.alembicmanager
@@ -41,7 +41,7 @@ class AlembicManager(artellapipe.ToolWidget, object):
         buttons_layout.setContentsMargins(2, 2, 2, 2)
         buttons_layout.setSpacing(2)
         self.main_layout.addLayout(buttons_layout)
-        self.main_layout.addLayout(splitters.SplitterLayout())
+        self.main_layout.addLayout(dividers.DividerLayout())
 
         self._exporter_btn = QPushButton('Exporter')
         self._exporter_btn.setIcon(export_icon)
