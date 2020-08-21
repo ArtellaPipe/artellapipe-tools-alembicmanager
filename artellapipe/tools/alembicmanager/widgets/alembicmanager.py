@@ -20,13 +20,13 @@ from Qt.QtWidgets import *
 import tpDcc
 from tpDcc.libs.qt.widgets import stack, dividers
 
-import artellapipe
+from artellapipe.core import tool
 import artellapipe.tools.alembicmanager
 
 LOGGER = logging.getLogger()
 
 
-class AlembicManager(artellapipe.ToolWidget, object):
+class AlembicManager(tool.ArtellaToolWidget, object):
 
     def __init__(self, project, config, settings, parent):
         super(AlembicManager, self).__init__(project=project, config=config, settings=settings, parent=parent)
