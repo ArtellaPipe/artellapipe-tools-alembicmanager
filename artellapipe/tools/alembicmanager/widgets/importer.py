@@ -7,64 +7,69 @@ Module that contains implementation for Alembic Importer
 
 from __future__ import print_function, division, absolute_import
 
-__author__ = "Tomas Poveda"
-__license__ = "MIT"
-__maintainer__ = "Tomas Poveda"
-__email__ = "tpovedatd@gmail.com"
-
 import os
 import json
-import logging.config
+import logging
 from functools import partial
 
-from Qt.QtCore import *
-from Qt.QtWidgets import *
+from Qt.QtCore import Qt, Signal, QSize
+from Qt.QtWidgets import QSizePolicy, QWidget
 
+from tpDcc import dcc
+from tpDcc.managers import resources
 from tpDcc.libs.python import decorators, python
-
-import tpDcc as tp
-
 from tpDcc.libs.qt.core import base
-from tpDcc.libs.qt.widgets import dividers
+from tpDcc.libs.qt.widgets import layouts, label, lineedit, dividers, buttons, checkbox
 
-import artellapipe.register
 from artellapipe.libs.alembic.core import alembic
 
-LOGGER = logging.getLogger()
+from artellapipe.tools.alembicmanager.core import consts
+
+logger = logging.getLogger(consts.TOOL_ID)
 
 
-class AlembicImporter(base.BaseWidget, object):
+class _MetaAlembicImporter(type):
+    def __call__(self, *args, **kwargs):
+        if dcc.client().is_maya():
+            from artellapipe.tools.alembicmanager.dccs.maya import importer
+            return type.__call__(importer.MayaAlembicImporter, *args, **kwargs)
+        elif dcc.client().is_houdini():
+            from artellapipe.tools.alembicmanager.dccs.houdini import importer
+            return type.__call__(importer.HoudiniAlembicImporter, *args, **kwargs)
+        else:
+            return type.__call__(BaseAlembicImporter, *args, **kwargs)
+
+
+class BaseAlembicImporter(base.BaseWidget, object):
 
     showOk = Signal(str)
 
     def __init__(self, project, parent=None):
 
         self._project = project
-        super(AlembicImporter, self).__init__(parent=parent)
+        super(BaseAlembicImporter, self).__init__(parent=parent)
 
     def ui(self):
-        super(AlembicImporter, self).ui()
+        super(BaseAlembicImporter, self).ui()
 
-        buttons_layout = QGridLayout()
+        buttons_layout = layouts.GridLayout()
         self.main_layout.addLayout(buttons_layout)
 
-        shot_name_lbl = QLabel('Shot Name: ')
-        self._shot_line = QLineEdit()
+        shot_name_lbl = label.BaseLabel('Shot Name: ', parent=self)
+        self._shot_line = lineedit.BaseLineEdit(parent=self)
         buttons_layout.addWidget(shot_name_lbl, 1, 0, 1, 1, Qt.AlignRight)
         buttons_layout.addWidget(self._shot_line, 1, 1)
         shot_name_lbl.setVisible(False)
         self._shot_line.setVisible(False)
 
-        folder_icon = tp.ResourcesMgr().icon('folder')
-        alembic_path_layout = QHBoxLayout()
-        alembic_path_layout.setContentsMargins(2, 2, 2, 2)
-        alembic_path_layout.setSpacing(2)
+        folder_icon = resources.icon('folder')
+        alembic_path_layout = layouts.HorizontalLayout(spacing=2, margins=(2, 2, 2, 2))
         alembic_path_widget = QWidget()
         alembic_path_widget.setLayout(alembic_path_layout)
-        alembic_path_lbl = QLabel('Alembic File: ')
-        self._alembic_path_line = QLineEdit()
+        alembic_path_lbl = label.BaseLabel('Alembic File: ', parent=self)
+        self._alembic_path_line = lineedit.BaseLineEdit(parent=self)
         self._alembic_path_line.setReadOnly(True)
-        self._alembic_path_btn = QPushButton()
+        self._alembic_path_btn = buttons.BaseButton(parent=self)
         self._alembic_path_btn.setIcon(folder_icon)
         self._alembic_path_btn.setIconSize(QSize(18, 18))
         self._alembic_path_btn.setStyleSheet(
@@ -74,15 +79,15 @@ class AlembicImporter(base.BaseWidget, object):
         buttons_layout.addWidget(alembic_path_lbl, 2, 0, 1, 1, Qt.AlignRight)
         buttons_layout.addWidget(alembic_path_widget, 2, 1)
 
-        import_mode_layout = QHBoxLayout()
+        import_mode_layout = layouts.HorizontalLayout(spacing=2, margins=(2, 2, 2, 2))
         import_mode_layout.setContentsMargins(2, 2, 2, 2)
         import_mode_layout.setSpacing(2)
         import_mode_widget = QWidget()
         import_mode_widget.setLayout(import_mode_layout)
-        import_mode_lbl = QLabel('Import mode: ')
-        self._create_radio = QRadioButton('Create')
-        self._add_radio = QRadioButton('Add')
-        self._merge_radio = QRadioButton('Merge')
+        import_mode_lbl = label.BaseLabel('Import mode: ', parent=self)
+        self._create_radio = buttons.BaseRadioButton('Create', parent=self)
+        self._add_radio = buttons.BaseRadioButton('Add', parent=self)
+        self._merge_radio = buttons.BaseRadioButton('Merge', parent=self)
         self._create_radio.setChecked(True)
         import_mode_layout.addWidget(self._create_radio)
         import_mode_layout.addWidget(self._add_radio)
@@ -92,40 +97,39 @@ class AlembicImporter(base.BaseWidget, object):
         import_mode_lbl.setVisible(False)
         import_mode_widget.setVisible(False)
 
-        self._auto_display_lbl = QLabel('Auto Display Smooth?: ')
-        self._auto_smooth_display = QCheckBox()
+        self._auto_display_lbl = label.BaseLabel('Auto Display Smooth?: ', parent=self)
+        self._auto_smooth_display = checkbox.BaseCheckBox(parent=self)
         self._auto_smooth_display.setChecked(True)
         buttons_layout.addWidget(self._auto_display_lbl, 4, 0, 1, 1, Qt.AlignRight)
         buttons_layout.addWidget(self._auto_smooth_display, 4, 1)
 
-        if tp.is_maya():
-            maya_gpu_cache_lbl = QLabel('Import Alembic as GPU Cache?')
-            self._maya_gpu_cache_cbx = QCheckBox()
+        if dcc.client().is_maya():
+            maya_gpu_cache_lbl = label.BaseLabel('Import Alembic as GPU Cache?', parent=self)
+            self._maya_gpu_cache_cbx = checkbox.BaseCheckBox(parent=self)
             self._maya_gpu_cache_cbx.setChecked(True)
             buttons_layout.addWidget(maya_gpu_cache_lbl, 5, 0, 1, 1, Qt.AlignRight)
             buttons_layout.addWidget(self._maya_gpu_cache_cbx, 5, 1)
-        elif tp.is_houdini():
-            hou_archive_abc_node_lbl = QLabel('Import Alembic as Archive?')
-            self._hou_archive_abc_node_cbx = QCheckBox()
+        elif dcc.client().is_houdini():
+            hou_archive_abc_node_lbl = label.BaseLabel('Import Alembic as Archive?', parent=self)
+            self._hou_archive_abc_node_cbx = checkbox.BaseCheckBox(parent=self)
             buttons_layout.addWidget(hou_archive_abc_node_lbl, 5, 0, 1, 1, Qt.AlignRight)
             buttons_layout.addWidget(self._hou_archive_abc_node_cbx, 5, 1)
 
+        self.main_layout.addStretch()
         self.main_layout.addLayout(dividers.DividerLayout())
 
-        buttons_layout = QHBoxLayout()
-        buttons_layout.setContentsMargins(2, 2, 2, 2)
-        buttons_layout.setSpacing(2)
+        buttons_layout = layouts.HorizontalLayout(spacing=2, margins=(2, 2, 2, 2))
         self.main_layout.addLayout(buttons_layout)
-        self._import_btn = QPushButton('Import')
-        self._import_btn.setIcon(tp.ResourcesMgr().icon('import'))
+        self._import_btn = buttons.BaseButton('Import', parent=self)
+        self._import_btn.setIcon(resources.icon('import'))
         self._import_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        self._reference_btn = QPushButton('Reference')
-        self._reference_btn.setIcon(tp.ResourcesMgr().icon('reference'))
+        self._reference_btn = buttons.BaseButton('Reference', parent=self)
+        self._reference_btn.setIcon(resources.icon('reference'))
         self._reference_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         buttons_layout.addWidget(self._import_btn)
         buttons_layout.addWidget(self._reference_btn)
 
-        if tp.is_houdini():
+        if dcc.client().is_houdini():
             self._reference_btn.setEnabled(False)
 
     def setup_signals(self):
@@ -158,24 +162,24 @@ class AlembicImporter(base.BaseWidget, object):
         """
 
         if not alembic_path or not os.path.isfile(alembic_path):
-            LOGGER.warning('Alembic file {} does not exits!'.format(alembic_path))
+            logger.warning('Alembic file {} does not exits!'.format(alembic_path))
             return None
 
         abc_name = os.path.basename(alembic_path).split('.')[0]
         tag_json_file = os.path.join(
             os.path.dirname(alembic_path), os.path.basename(alembic_path).replace('.abc', '_abc.info'))
         if not os.path.isfile(tag_json_file):
-            LOGGER.warning('No Alembic Info file found!')
+            logger.warning('No Alembic Info file found!')
             return
 
         with open(tag_json_file, 'r') as f:
             tag_info = json.loads(f.read())
         if not tag_info:
-            LOGGER.warning('No Alembic Info loaded!')
+            logger.warning('No Alembic Info loaded!')
             return
 
-        root = tp.Dcc.create_empty_group(name=abc_name)
-        AlembicImporter._add_tag_info_data(project, tag_info, root)
+        root = dcc.client().create_empty_group(name=abc_name)
+        BaseAlembicImporter._add_tag_info_data(project, tag_info, root)
         sel = [root]
         sel = sel or None
 
@@ -185,26 +189,26 @@ class AlembicImporter(base.BaseWidget, object):
         new_nodes = alembic.reference_alembic(
             project=project, alembic_file=alembic_path, namespace=namespace, fix_path=fix_path)
         if not new_nodes:
-            LOGGER.warning('Error while reference Alembic file: {}'.format(alembic_path))
+            logger.warning('Error while reference Alembic file: {}'.format(alembic_path))
             return
         for obj in new_nodes:
-            if not tp.Dcc.object_exists(obj):
+            if not dcc.node_exists(obj):
                 continue
-            if not tp.Dcc.node_type(obj) == 'transform':
+            if not dcc.client().node_type(obj) == 'transform':
                 continue
-            obj_parent = tp.Dcc.node_parent(obj)
+            obj_parent = dcc.client().node_parent(obj)
             if obj_parent:
                 continue
-            tp.Dcc.set_parent(obj, sel[0])
-        tp.Dcc.select_object(sel[0])
+            dcc.client().set_parent(obj, sel[0])
+        dcc.client().select_node(sel[0])
 
         new_nodes.insert(0, sel[0])
 
         # After parenting referenced nodes, full path changes, here we update node paths
-        if tp.is_maya():
+        if dcc.client().is_maya():
             new_paths = list()
             for n in new_nodes:
-                if tp.Dcc.object_exists(n):
+                if dcc.node_exists(n):
                     new_paths.append(n)
                 else:
                     if n.startswith('|'):
@@ -224,9 +228,9 @@ class AlembicImporter(base.BaseWidget, object):
         :param attr_node: str
         """
 
-        if not tp.Dcc.attribute_exists(node=attr_node, attribute_name='tag_info'):
-            tp.Dcc.add_string_attribute(node=attr_node, attribute_name='tag_info', keyable=True)
-        tp.Dcc.set_string_attribute_value(node=attr_node, attribute_name='tag_info', attribute_value=str(tag_info))
+        if not dcc.client().attribute_exists(node=attr_node, attribute_name='tag_info'):
+            dcc.client().add_string_attribute(node=attr_node, attribute_name='tag_info', keyable=True)
+        dcc.client().set_string_attribute_value(node=attr_node, attribute_name='tag_info', attribute_value=str(tag_info))
 
     def refresh(self):
         """
@@ -241,7 +245,7 @@ class AlembicImporter(base.BaseWidget, object):
         """
 
         shot_name = 'Undefined'
-        current_scene = tp.Dcc.scene_path()
+        current_scene = dcc.client().scene_path()
         if current_scene:
             current_scene = os.path.basename(current_scene)
 
@@ -262,9 +266,9 @@ class AlembicImporter(base.BaseWidget, object):
             self._project.get_path(), shot_name)) if shot_name != 'unresolved' else self._project.get_path()
 
         pattern = 'Alembic Files (*.abc)'
-        if tp.is_houdini():
+        if dcc.client().is_houdini():
             pattern = '*.abc'
-        abc_file = tp.Dcc.select_file_dialog(
+        abc_file = dcc.client().select_file_dialog(
             title='Select Alembic to Import', start_directory=abc_folder, pattern=pattern)
         if abc_file:
             self._alembic_path_line.setText(abc_file)
@@ -277,7 +281,7 @@ class AlembicImporter(base.BaseWidget, object):
 
         abc_file = self._alembic_path_line.text()
         if not abc_file or not os.path.isfile(abc_file):
-            tp.Dcc.confirm_dialog(
+            dcc.client().confirm_dialog(
                 title='Error', message='No Alembic File is selected or file is not currently available in disk')
             return None
 
@@ -288,10 +292,10 @@ class AlembicImporter(base.BaseWidget, object):
             with open(tag_json_file, 'r') as f:
                 tag_info = json.loads(f.read())
             if not tag_info:
-                LOGGER.warning('No Alembic Info loaded!')
+                logger.warning('No Alembic Info loaded!')
                 valid_tag_info = False
         else:
-            LOGGER.warning('No Alembic Info file found!')
+            logger.warning('No Alembic Info file found!')
             valid_tag_info = False
 
         if as_reference:
@@ -305,7 +309,7 @@ class AlembicImporter(base.BaseWidget, object):
         for key in tag_info.keys():
             if reference_nodes:
                 for obj in reference_nodes:
-                    short_obj = tp.Dcc.node_short_name(obj)
+                    short_obj = dcc.client().node_short_name(obj)
                     if key == short_obj:
                         self._add_tag_info_data(self._project, tag_info[key], obj)
                         added_tag = True
@@ -328,7 +332,7 @@ class AlembicImporter(base.BaseWidget, object):
         :return: str
         """
 
-        root = tp.Dcc.create_empty_group(name=group_name)
+        root = dcc.client().create_empty_group(name=group_name)
 
         return root
 
@@ -360,19 +364,21 @@ class AlembicImporter(base.BaseWidget, object):
 
         all_nodes = alembic.reference_alembic(project=self._project, alembic_file=alembic_file, namespace=namespace)
         if not all_nodes:
-            LOGGER.warning('Error while reference Alembic file: {}'.format(alembic_file))
+            logger.warning('Error while reference Alembic file: {}'.format(alembic_file))
             return
         for obj in all_nodes:
-            if not tp.Dcc.object_exists(obj):
+            if not dcc.node_exists(obj):
                 continue
-            if not tp.Dcc.node_type(obj) == 'transform':
+            if not dcc.client().node_type(obj) == 'transform':
                 continue
-            obj_parent = tp.Dcc.node_parent(obj)
+            obj_parent = dcc.client().node_parent(obj)
             if obj_parent:
                 continue
-            tp.Dcc.set_parent(node=obj, parent=parent)
+            dcc.client().set_parent(node=obj, parent=parent)
 
         return all_nodes
 
 
-artellapipe.register.register_class('AlembicImporter', AlembicImporter)
+@decorators.add_metaclass(_MetaAlembicImporter)
+class AlembicImporter(object):
+    pass

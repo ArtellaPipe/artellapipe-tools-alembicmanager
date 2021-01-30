@@ -7,54 +7,48 @@ Tool to export/import Alembic (.abc) files
 
 from __future__ import print_function, division, absolute_import
 
-__author__ = "Tomas Poveda"
-__license__ = "MIT"
-__maintainer__ = "Tomas Poveda"
-__email__ = "tpovedatd@gmail.com"
-
-import logging.config
+import logging
 from functools import partial
 
-from Qt.QtWidgets import *
+from Qt.QtWidgets import QButtonGroup
 
-import tpDcc
-from tpDcc.libs.qt.widgets import stack, dividers
+from tpDcc.managers import resources
+from tpDcc.libs.qt.widgets import layouts, buttons, stack, dividers
 
 from artellapipe.core import tool
-import artellapipe.tools.alembicmanager
+from artellapipe.tools.alembicmanager.core import consts
+from artellapipe.tools.alembicmanager.widgets import importer, exporter
 
-LOGGER = logging.getLogger()
+logger = logging.getLogger(consts.TOOL_ID)
 
 
-class AlembicManager(tool.ArtellaToolWidget, object):
+class AlembicManagerView(tool.ArtellaToolWidget, object):
 
     def __init__(self, project, config, settings, parent):
-        super(AlembicManager, self).__init__(project=project, config=config, settings=settings, parent=parent)
+        super(AlembicManagerView, self).__init__(project=project, config=config, settings=settings, parent=parent)
 
     def ui(self):
-        super(AlembicManager, self).ui()
+        super(AlembicManagerView, self).ui()
 
-        export_icon = tpDcc.ResourcesMgr().icon('export')
-        import_icon = tpDcc.ResourcesMgr().icon('import')
+        export_icon = resources.icon('export')
+        import_icon = resources.icon('import')
 
-        buttons_layout = QHBoxLayout()
-        buttons_layout.setContentsMargins(2, 2, 2, 2)
-        buttons_layout.setSpacing(2)
+        buttons_layout = layouts.HorizontalLayout(spacing=2, margins=(2, 2, 2, 2))
         self.main_layout.addLayout(buttons_layout)
         self.main_layout.addLayout(dividers.DividerLayout())
 
-        self._exporter_btn = QPushButton('Exporter')
+        self._exporter_btn = buttons.BaseButton('Exporter', parent=self)
         self._exporter_btn.setIcon(export_icon)
         self._exporter_btn.setMinimumWidth(80)
         self._exporter_btn.setCheckable(True)
-        self._importer_btn = QPushButton('Importer')
+        self._importer_btn = buttons.BaseButton('Importer', parent=self)
         self._importer_btn.setIcon(import_icon)
         self._importer_btn.setMinimumWidth(80)
         self._importer_btn.setCheckable(True)
-        buttons_layout.addItem(QSpacerItem(10, 0, QSizePolicy.Expanding, QSizePolicy.Preferred))
+        buttons_layout.addStretch()
         buttons_layout.addWidget(self._exporter_btn)
         buttons_layout.addWidget(self._importer_btn)
-        buttons_layout.addItem(QSpacerItem(10, 0, QSizePolicy.Expanding, QSizePolicy.Preferred))
+        self._importer_btn.setCheckable(True)
 
         self._buttons_grp = QButtonGroup(self)
         self._buttons_grp.setExclusive(True)
@@ -65,8 +59,8 @@ class AlembicManager(tool.ArtellaToolWidget, object):
         self._stack = stack.SlidingStackedWidget()
         self.main_layout.addWidget(self._stack)
 
-        self._alembic_exporter = artellapipe.AlembicExporter(project=self.project)
-        self._alembic_importer = artellapipe.AlembicImporter(project=self.project)
+        self._alembic_exporter = exporter.AlembicExporter(project=self.project)
+        self._alembic_importer = importer.AlembicImporter(project=self.project)
 
         self._stack.addWidget(self._alembic_exporter)
         self._stack.addWidget(self._alembic_importer)
@@ -110,7 +104,7 @@ class AlembicManager(tool.ArtellaToolWidget, object):
         :param warning_msg: str
         """
 
-        LOGGER.debug(warning_msg)
+        logger.debug(warning_msg)
         self.show_ok_message(warning_msg)
 
     def _on_show_warning(self, warning_msg):
@@ -119,5 +113,5 @@ class AlembicManager(tool.ArtellaToolWidget, object):
         :param warning_msg: str
         """
 
-        LOGGER.warning(warning_msg)
+        logger.warning(warning_msg)
         self.show_warning_message(warning_msg)

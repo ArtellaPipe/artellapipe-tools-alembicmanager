@@ -7,27 +7,19 @@ Module that contains Alembic Importer implementation for Houdini
 
 from __future__ import print_function, division, absolute_import
 
-__author__ = "Tomas Poveda"
-__license__ = "MIT"
-__maintainer__ = "Tomas Poveda"
-__email__ = "tpovedatd@gmail.com"
-
 import os
 import json
 import logging
 
-import tpDcc as tp
+from tpDcc import dcc
 
-import artellapipe.register
-from artellapipe.tools.alembicmanager.widgets.base import alembicimporter
+from artellapipe.tools.alembicmanager.core import consts
+from artellapipe.tools.alembicmanager.widgets import importer
 
-if tp.is_maya():
-    from tpDcc.dccs.maya.core import scene as maya_scene
-
-LOGGER = logging.getLogger()
+logger = logging.getLogger(consts.TOOL_ID)
 
 
-class MayaAlembicImporter(alembicimporter.AlembicImporter, object):
+class MayaAlembicImporter(importer.BaseAlembicImporter, object):
     def __init__(self, project, parent=None):
         super(MayaAlembicImporter, self).__init__(project=project, parent=parent)
 
@@ -44,7 +36,7 @@ class MayaAlembicImporter(alembicimporter.AlembicImporter, object):
         """
 
         if not alembic_path or not os.path.isfile(alembic_path):
-            LOGGER.warning('Alembic file {} does not exits!'.format(alembic_path))
+            logger.warning('Alembic file {} does not exits!'.format(alembic_path))
             return None
 
         tag_json_file = os.path.join(
@@ -54,21 +46,21 @@ class MayaAlembicImporter(alembicimporter.AlembicImporter, object):
             with open(tag_json_file, 'r') as f:
                 tag_info = json.loads(f.read())
             if not tag_info:
-                LOGGER.warning('No Alembic Info loaded!')
+                logger.warning('No Alembic Info loaded!')
                 valid_tag_info = False
         else:
-            LOGGER.warning(
+            logger.warning(
                 'No Alembic Info file found! '
                 'Take into account that imported Alembic is not supported by our current pipeline!')
             valid_tag_info = False
 
         if not parent:
-            parent = tp.Dcc.create_empty_group(name=os.path.basename(alembic_path))
+            parent = dcc.client().create_empty_group(name=os.path.basename(alembic_path))
         else:
-            if not tp.Dcc.object_exists(parent):
-                parent = tp.Dcc.create_empty_group(name=parent)
+            if not dcc.node_exists(parent):
+                parent = dcc.client().create_empty_group(name=parent)
             else:
-                LOGGER.warning(
+                logger.warning(
                     'Impossible to import Alembic into scene because'
                     ' node named "{}" already exists in the scene!'.format(parent))
                 return
@@ -115,22 +107,24 @@ class MayaAlembicImporter(alembicimporter.AlembicImporter, object):
 
         reference_nodes = super(MayaAlembicImporter, self)._on_import_alembic(as_reference=as_reference)
 
-        if self._auto_smooth_display.isChecked():
-            if reference_nodes and type(reference_nodes) in [list, tuple]:
-                for obj in reference_nodes:
-                    if obj and tp.Dcc.object_exists(obj):
-                        if tp.Dcc.node_type(obj) == 'shape':
-                            if tp.Dcc.attribute_exists(node=obj, attribute_name='aiSubdivType'):
-                                tp.Dcc.set_integer_attribute_value(node=obj, attribute_name='aiSubdivType',
-                                                                   attribute_value=1)
-                        elif tp.Dcc.node_type(obj) == 'transform':
-                            shapes = tp.Dcc.list_shapes(node=obj, full_path=True)
-                            if not shapes:
-                                continue
-                            for s in shapes:
-                                if tp.Dcc.attribute_exists(node=s, attribute_name='aiSubdivType'):
-                                    tp.Dcc.set_integer_attribute_value(node=s, attribute_name='aiSubdivType',
-                                                                       attribute_value=1)
+        if not self._auto_smooth_display.isChecked():
+            return
 
+        if not reference_nodes or type(reference_nodes) not in [list, tuple]:
+            return
 
-artellapipe.register.register_class('AlembicImporter', MayaAlembicImporter)
+        for obj in reference_nodes:
+            if not obj or not dcc.node_exists(obj):
+                continue
+            if dcc.client().node_type(obj) == 'shape':
+                if dcc.client().attribute_exists(node=obj, attribute_name='aiSubdivType'):
+                    dcc.client().set_integer_attribute_value(
+                        node=obj, attribute_name='aiSubdivType', attribute_value=1)
+            elif dcc.client().node_type(obj) == 'transform':
+                shapes = dcc.client().list_shapes(node=obj, full_path=True)
+                if not shapes:
+                    continue
+                for s in shapes:
+                    if dcc.client().attribute_exists(node=s, attribute_name='aiSubdivType'):
+                        dcc.client().set_integer_attribute_value(
+                            node=s, attribute_name='aiSubdivType', attribute_value=1)
